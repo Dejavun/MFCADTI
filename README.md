@@ -1,5 +1,6 @@
 # MFCADTI
 **MFCADTI: improving drug-target interaction prediction by integrating multiple feature through cross attention mechanism**
+
 ![Image text](https://github.com/Dejavun/MFCADTI/blob/086f9db38b17dc13066b7442fb782b81fe807a72/CrossAttentionDTI.png)
 Fig. 1. The framework of MFCADTI.The MFCADTI framework consists of three modules: A. Network feature extraction. B. Attribute feature extraction. C. Cross-attention feature fusion and prediction.
 
@@ -23,7 +24,7 @@ The ESFP folder contains the data needed for the FCS embedding method that is bu
 
 # Resources
 * main.py: train and test the model
-* hyperparameter.py: set the hyperparameter of MFCADTI
+* model_param.py: set the hyperparameter of MFCADTI
 * model.py: MFCADTI model architecture
 * measure.py: The module for calculating metrics
 
