@@ -1,0 +1,17 @@
+./result/result_Luo/CA_P
+testing...
+The number of testing data:385
+test_threshold:: value: 0.258302
+test_sensitivity: 0.9510869565217391
+test_specificity: 0.8208955223880597
+test_accuracy: 0.8831168831168831
+test_mcc: 0.7748159137887002
+test_auc: 0.9490590525632706
+test_precision: 0.8293838862559242
+test_recall: 0.9510869565217391
+test_f1: 0.8860759493670886
+test_AUPRC: 0.9312128002746687
+test_true_negative:: value: 165.000000
+test_false_positive:: value: 36.000000
+test_false_negative:: value: 9.000000
+test_true_positive:: value: 175.000000

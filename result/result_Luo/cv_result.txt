@@ -1,0 +1,5 @@
+./result/result_Luo/CA_P
+training...
+The number of training data:3288
+The number of validation data:173
+epoch_1=====================
