@@ -20,7 +20,7 @@ Fig. 1. The framework of MFCADTI.The MFCADTI framework consists of three modules
 In the dataset folder, we provide the processed data of Luo dataset.
 
 # ESFP and dictionary
-The ESFP folder contains the data needed for the FCS embedding method that is built based on MolTrans https://github.com/kexinhuang12345/MolTrans. The "dictionary" directory includes the dictionaries constructed for drug and target sequences in the luo dataset.
+The ESFP folder contains the data needed for the FCS embedding method that is built based on [MolTrans] (https://github.com/kexinhuang12345/MolTrans). The "dictionary" directory includes the dictionaries constructed for drug and target sequences in the luo dataset.
 
 # Resources
 * main.py: train and test the model
