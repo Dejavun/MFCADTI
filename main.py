@@ -11,7 +11,7 @@ from torch import optim
 from torch.autograd import Variable
 from subword_nmt.apply_bpe import BPE
 import codecs
-from cross_attention_network import CrossAttention
+from model import CrossAttention
 from measure import measure_evaluation, sensitivity, specificity, auc, mcc, accuracy, precision, recall, f1, cutoff, AUPRC, cofusion_matrix
 import csv
 from sklearn.model_selection import train_test_split,StratifiedKFold
@@ -30,16 +30,16 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 def drug2emb_encoder(x, words2idx_d, max_d, model_params):  # 药物编码 x是smiles
     if model_params['encode_method'] == 'smiles':
         t1 = x
+        # O(C( = O)C(C)(C) C)c1c(OC( = O)C(C)(C)C)ccc(C(O)CNC)c1
     # elif model_params['encode_method'] == 'selfies':
     #    t1 = sf.encoder(x).replace("][", "],[").split(',')
     else:
-        t1 = dbpe.process_line(x).split()  
+        t1 = dbpe.process_line(x).split()  #P(=O)(O)(O)C(P(=O)(O)O)(O)CCN
 
     try:
         i1 = np.asarray([words2idx_d[i] for i in t1])  # index
     except:
         i1 = np.array([0])
-        # print(x)
     
     l = len(i1)
 
@@ -58,10 +58,9 @@ def protein2emb_encoder(x, words2idx_p, max_p, model_params):  # 蛋白质编码
     if model_params['encode_method'] == 'smiles':
         t1 = x
     # elif model_params['encode_method'] == 'selfies':
-    #   t1 = x   # 这里不一样
+    #   t1 = x   
     else:
         t1 = pbpe.process_line(x).split()
-
     try:
         i1 = np.asarray([words2idx_p[i] for i in t1])  # index
     except:
@@ -75,6 +74,7 @@ def protein2emb_encoder(x, words2idx_p, max_p, model_params):  # 蛋白质编码
     else:
         i = i1[:max_p]
         input_mask = [1] * max_p
+
         
     return i, np.asarray(input_mask)
 
@@ -99,7 +99,9 @@ class BIN_Data_Encoder(data.Dataset):
 
         index = self.list_IDs[index]
         drug_id = self.df.iloc[index]['Drug']
+
         protein_id = self.df.iloc[index]['Target']
+
         d = self.df.iloc[index]['SMILES']
         p = self.df.iloc[index]['Target Sequence']
         d_line = self.df.iloc[index]['Drug_embed']
@@ -108,6 +110,7 @@ class BIN_Data_Encoder(data.Dataset):
         p_n = np.asarray(literal_eval(p_line))
         d_v, input_mask_d = drug2emb_encoder(d, self.words2idx_d, self.max_d, self.model_params)
         p_v, input_mask_p = protein2emb_encoder(p, self.words2idx_p, self.max_p, self.model_params)
+
         y = self.labels[index]
         return drug_id, protein_id, d_v, p_v, input_mask_d, input_mask_p, y.astype(np.float32), torch.from_numpy(d_n.astype("float32")),\
                torch.from_numpy(p_n.astype("float32"))
@@ -122,11 +125,13 @@ def training_testing_process(config, options, model_params):  # options
         max_d = options['max_d']
         max_p = options['max_p']
      
-        params = {'batch_size': config["training_batch_size"], 'shuffle': True, 'num_workers': 0,  'drop_last': False}
+        # params = {'batch_size': config["training_batch_size"], 'shuffle': True, 'num_workers': 0,  'drop_last': False}
+        params = {'batch_size': config["training_batch_size"], 'shuffle': False, 'num_workers': 0, 'drop_last': False}
         training_set = BIN_Data_Encoder(df_train.index.values, df_train.Label.values, df_train, words2idx_d, max_d, words2idx_p, max_p, model_params)
         training_generator = data.DataLoader(training_set, **params)
 
-        params = {'batch_size': model_params["validation_batch_size"], 'shuffle': True, 'num_workers': 0,  'drop_last': False}
+        # params = {'batch_size': model_params["validation_batch_size"], 'shuffle': True, 'num_workers': 0,  'drop_last': False}
+        params = {'batch_size': config["training_batch_size"], 'shuffle': False, 'num_workers': 0, 'drop_last': False}
         validation_set = BIN_Data_Encoder(df_val.index.values, df_val.Label.values, df_val, words2idx_d, max_d, words2idx_p, max_p, model_params)
         validation_generator = data.DataLoader(validation_set, **params)
  
@@ -160,7 +165,7 @@ def training_testing_process(config, options, model_params):  # options
                 net.train()
                 for i, (drug_id, protein_id, drug_mat, protein_mat, attn_mask_drug, attn_mask_protein, labels, drug_net, protein_net) in enumerate(training_generator):
                     opt.zero_grad()
-                    probs,train_feature = net(drug_mat.long().to(device), protein_mat.long().to(device),
+                    probs= net(drug_mat.long().to(device), protein_mat.long().to(device),
                                 attn_mask_drug.long().to(device), attn_mask_protein.long().to(device),
                                 drug_net.to(device), protein_net.to(device))
                     labels = Variable(torch.from_numpy(np.array(labels)).float()).to(device)
@@ -234,7 +239,7 @@ def training_testing_process(config, options, model_params):  # options
                     early_stop_count = 0
                     max_met = epoch_met
 
-                    # torch.save(net.state_dict(), model_params['out_path'] +"/data_model/deep_model")
+                    #torch.save(net.state_dict(), model_params['out_path'] +"/data_model/deep_model.pth")
                     final_val_probs = val_probs
                     final_val_labels = val_labels
                     final_train_probs = train_probs
@@ -259,10 +264,11 @@ def training_testing_process(config, options, model_params):  # options
             # threshold_1 = model_params["thresh"]
             print("Best threshold (AUC) is " + str(threshold_1), file=f, flush=True)
             print("Best threshold (PRC) is " + str(threshold_2), file=f, flush=True)
-            torch.save(net.state_dict(), model_params['out_path'] +"/data_model/deep_model")
+            torch.save(net.state_dict(), model_params['out_path'] +"/data_model/deep_model.pth")
 
         # testing_process
-        params = {'batch_size': model_params['validation_batch_size'], 'shuffle': True, 'num_workers': 0,  'drop_last': False}
+        # params = {'batch_size': model_params['validation_batch_size'], 'shuffle': True, 'num_workers': 0,  'drop_last': False}
+        params = {'batch_size': config["training_batch_size"], 'shuffle': False, 'num_workers': 0, 'drop_last': False}
         test_set = BIN_Data_Encoder(df_test.index.values, df_test.Label.values, df_test, words2idx_d, max_d, words2idx_p, max_p, model_params) 
         test_generator = data.DataLoader(test_set, **params)
 
@@ -312,15 +318,9 @@ if __name__ == '__main__':
     parser = ArgumentParser(description='Test')
     parser.add_argument('--encode_method', help='fcs, smiles')
     parser.add_argument('--algorithm', help='')
-    parser.add_argument('--DB', choices=['Luo', 'Luo_Vage','Luo_DeepWalk','Luo_Node2vec','deep_DTnet',
-                                         'deep_DTnet_deepwalk','deep_DTnet_node2vec', 'deep_DTnet_vage',
-                                         'Luo_CaseStudy','deepDTnet_CaseStudy','Luo_16','Luo_32','Luo_128',
-                                         'Luo_256','Luo_16_1','Luo_32_1','Luo_128_1', 'Luo_256_1','Luo_1:3',
-                                         'Luo_1:5','Luo_1:7', 'Luo_1:10','Luo_S1','Luo_S2', 'Luo_S3',
-                                         'deep_DTnet_S1','deep_DTnet_S2', 'deep_DTnet_S3'],
-                                          default='Luo', type=str, metavar='DB', help='DB name')
-    parser.add_argument('--epochs', default=50, type=int, metavar='N', help='number of total epochs to run')
-    parser.add_argument('--iter_num', default=1, type=int, metavar='N', help='iteration number')
+    parser.add_argument('--DB', choices=['Luo'],default='Luo', type=str, metavar='DB', help='DB name')
+    parser.add_argument('--epochs', default=150, type=int, metavar='N', help='number of total epochs to run')
+    parser.add_argument('--iter_num', default=5, type=int, metavar='N', help='iteration number')
     args = parser.parse_args()
     model_params = model_param_list()
     model_params['encode_method'] = args.encode_method  # fcs, smiles, selfies
@@ -359,8 +359,10 @@ if __name__ == '__main__':
     vocab_path = './ESPF/drug_codes_chembl.txt'
     bpe_codes_drug = codecs.open(vocab_path)
     dbpe = BPE(bpe_codes_drug, merges=-1, separator='')
+
     sub_csv = pd.read_csv('./ESPF/subword_units_map_chembl.csv')
     idx2word_d = sub_csv['index'].values
+
     words2idx_d = dict(zip(idx2word_d, range(0, len(idx2word_d))))
 
     # dataset input
