@@ -187,7 +187,7 @@ class CrossAttention(nn.Module):
         self.h_out_4 = input_4
 
         # self.out_1, _ = torch.max(self.h_out_1, dim=1)  # [128, 64]
-        #self.out_2, _ = torch.max(self.h_out_2, dim=1)  # [128, 64]
+        # self.out_2, _ = torch.max(self.h_out_2, dim=1)  # [128, 64]
         #self.drug = torch.cat((self.out_1, self.h_out_3), dim=1)
         #self.protein = torch.cat((self.out_2, self.h_out_4), dim=1)
         # out_1_q, out_1_k, out_1_v = self.drug, self.protein, self.protein
@@ -197,11 +197,12 @@ class CrossAttention(nn.Module):
 
 
 
-        #out_1_q, out_1_k, out_1_v = self.h_out_3, self.h_out_1, self.h_out_1
-        #self.out_1_temp = self.att_list_1(out_1_q, out_1_k, out_1_v, None)
+        out_1_q, out_1_k, out_1_v = self.h_out_3, self.h_out_1, self.h_out_1
+        self.out_1_temp = self.att_list_1(out_1_q, out_1_k, out_1_v, None)
         # #
-        #out_2_q, out_2_k, out_2_v = self.h_out_4, self.h_out_2, self.h_out_2
-        #self.out_2_temp = self.att_list_1(out_2_q, out_2_k, out_2_v, None)
+
+        out_2_q, out_2_k, out_2_v = self.h_out_4, self.h_out_2, self.h_out_2
+        self.out_2_temp = self.att_list_1(out_2_q, out_2_k, out_2_v, None)
         # #
         #self.out_1, _ = torch.max(self.out_1_temp, dim=1)  # [128, 64]
         #self.out_2, _ = torch.max(self.out_2_temp, dim=1)  # [128, 64]
@@ -210,21 +211,18 @@ class CrossAttention(nn.Module):
         # #
         # out_3 = self.dropout_layer_pool(self.drug_protein)
 
-
-        # cross attention
-
-        out_1_q, out_1_k, out_1_v = self.h_out_3, self.h_out_3, self.h_out_3
+        #out_1_q, out_1_k, out_1_v = self.h_out_3, self.h_out_3, self.h_out_3
        # out_1_q: [128,64], out_1_k: [128,50,64], out_1_v: [128,50,64], attn_mask_1:[128,1,1,50]
 
 
-        self.out_1_temp = self.att_list_1(out_1_q, out_1_k, out_1_v, None)
+        #self.out_1_temp = self.att_list_1(out_1_q, out_1_k, out_1_v, None)
         #self.out_1_temp = self.att_list_1(out_1_q, out_1_k, out_1_v, attn_mask_1)  # drug cross-attention
         #out_1_temp: [128,128,64]
 
-        out_2_q, out_2_k, out_2_v = self.h_out_4, self.h_out_4, self.h_out_4
+        #out_2_q, out_2_k, out_2_v = self.h_out_4, self.h_out_4, self.h_out_4
         #out_2_q: [128,64], out_2_k:[128,545,64], out_2_v: [128,545,64], attn_mask_2:[128,1,1,545]
 
-        self.out_2_temp = self.att_list_2(out_2_q, out_2_k, out_2_v, None)
+        #self.out_2_temp = self.att_list_2(out_2_q, out_2_k, out_2_v, None)
         #self.out_2_temp = self.att_list_2(out_2_q, out_2_k, out_2_v, attn_mask_2)  # protein cross-attention
         #out_2_temp: [128,128,64]
 
@@ -282,10 +280,4 @@ class CrossAttention(nn.Module):
 
         # out = self.CNN(out_2)  # drug
 
-        return out,train_feature
-
-
-
-
-
-
+        return out
