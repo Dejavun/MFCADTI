@@ -13,10 +13,9 @@ def labels_list(x, thresh):
 
 
 def sensitivity(y_true, y_prob, thresh=0.5):
-    # 原写法
     y_true = np.array(y_true)
     y_prob = (np.array(y_prob) + 1 - thresh).astype(np.int16)
-    # 我改的
+   
     # y_true = torch.tensor(y_true)
     # y_prob = labels_list(y_prob, thresh)
     tn, fp, fn, tp = metrics.confusion_matrix(y_true, y_prob).ravel()
@@ -24,10 +23,9 @@ def sensitivity(y_true, y_prob, thresh=0.5):
 
 
 def specificity(y_true, y_prob, thresh=0.5):
-    # 原写法
     y_true = np.array(y_true)
     y_prob = (np.array(y_prob) + 1 - thresh).astype(np.int16)
-    # 我改的
+    
     # y_true = torch.tensor(y_true)
     # y_prob = labels_list(y_prob, thresh)
     tn, fp, fn, tp = metrics.confusion_matrix(y_true, y_prob).ravel()
@@ -35,30 +33,27 @@ def specificity(y_true, y_prob, thresh=0.5):
 
 
 def auc(y_true, y_prob):
-    # 原写法
     y_true = np.array(y_true)
     y_prob = np.array(y_prob)
-    # 我改的
+ 
     # y_true = torch.tensor(y_true)
     # y_prob = labels_list(y_prob, thresh=0.5)
     return metrics.roc_auc_score(y_true, y_prob)
 
 
 def mcc(y_true, y_prob, thresh=0.5):
-    # 原写法
     y_true = np.array(y_true)
     y_prob = (np.array(y_prob) + 1 - thresh).astype(np.int16)
-    # 我改的
+    
     # y_true = torch.tensor(y_true)
     # y_prob = labels_list(y_prob, thresh)
     return metrics.matthews_corrcoef(y_true, y_prob)
 
 
 def accuracy(y_true, y_prob, thresh=0.5):
-    # 原写法
     y_true = np.array(y_true)
     y_prob = (np.array(y_prob) + 1 - thresh).astype(np.int16)
-    # 我改的
+
     # y_true = torch.tensor(y_true)
     # y_prob = labels_list(y_prob, thresh)
     return metrics.accuracy_score(y_true, y_prob)
@@ -72,51 +67,46 @@ def cutoff(y_true, y_prob):
 
 
 def precision(y_true, y_prob, thresh=0.5):
-    # 原写法
     y_true = np.array(y_true)
     y_prob = (np.array(y_prob) + 1 - thresh).astype(np.int16)
-    # 我改的
+
     # y_true = torch.tensor(y_true)
     # y_prob = labels_list(y_prob, thresh)
     return metrics.precision_score(y_true, y_prob)
 
 
 def recall(y_true, y_prob, thresh=0.5):
-    # 原写法
     y_true = np.array(y_true)
     y_prob = (np.array(y_prob) + 1 - thresh).astype(np.int16)
-    # 我改的
+    
     # y_true = torch.tensor(y_true)
     # y_prob = labels_list(y_prob, thresh)
     return metrics.recall_score(y_true, y_prob)
 
 
 def f1(y_true, y_prob, thresh=0.5):
-    # 原写法
     y_true = np.array(y_true)
     y_prob = (np.array(y_prob) + 1 - thresh).astype(np.int16)
-    # 我改的
+
     # y_true = torch.tensor(y_true)
     # y_prob = labels_list(y_prob, thresh)
     return metrics.f1_score(y_true, y_prob)
 
 
 def AUPRC(y_true, y_prob):
-    # 原写法
     y_true = np.array(y_true)
     y_prob = np.array(y_prob)
     return metrics.average_precision_score(y_true, y_prob)  # 平均精度分数
-    # 我改的
+   
     # y_prob = labels_list(y_prob, thresh=0.5)
     # pre, rec, _ = metrics.precision_recall_curve(y_true, y_prob)
     # return metrics.auc(rec, pre)
 
 
 def cofusion_matrix(y_true, y_prob, thresh=0.5):
-    # 原写法
     y_true = np.array(y_true)
     y_prob = (np.array(y_prob) + 1 - thresh).astype(np.int16)
-    # 我改的
+    
     # y_true = torch.tensor(y_true)
     # y_prob = labels_list(y_prob, thresh)
     tn, fp, fn, tp = metrics.confusion_matrix(y_true, y_prob).ravel()
