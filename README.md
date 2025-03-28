@@ -4,7 +4,7 @@
 Fig. 1. The framework of MFCADTI.The MFCADTI framework consists of three modules: A. Network feature extraction. B. Attribute feature extraction. C. Cross-attention feature fusion and prediction.
 
 # Dependencies
-·pytorch==1.12.0
+*pytorch==1.12.0
 ·numpy==1.23.1
 ·pandas==1.4.3
 ·tensorboardX==2.6
