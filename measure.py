@@ -161,4 +161,3 @@ def measure_evaluation(score, prob, label, index_val):
     tn_t, fp_t, fn_t, tp_t = cofusion_matrix(label, prob, thresh=0.5)
  
     return score
-
